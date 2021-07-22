@@ -1,7 +1,7 @@
 @extends('back-end.master')
 
 @section('title')
-  <title>Perkyrabbit Dashboard</title>
+  <title>Bfin Dashboard</title>
 @endsection
 
 @section('css')
@@ -20,12 +20,11 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0  text-center">Create Employee</h1>
+            <h1 class="m-0  text-center">Dashboard</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="">Home</a></li>
-              <li class="breadcrumb-item active">Employee</li>
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
             </ol>
           </div>
         </div>

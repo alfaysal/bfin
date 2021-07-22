@@ -78,6 +78,16 @@
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{{ asset('/') }}/back-end/asset/dist/js/pages/dashboard2.js"></script>
 <!-- Yield Script For Single Pages -->
+
+<script type="text/javascript">
+
+   $.ajaxSetup({
+            headers: {'X-CSRF-Token': '{{ csrf_token() }}'}
+        });
+
+    baseURL = {!! json_encode(url('/')) !!}
+
+</script>
   @yield('scripts')
 
 
