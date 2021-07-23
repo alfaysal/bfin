@@ -8,11 +8,13 @@ use App\Model\FrontEnd\Blog;
 use App\Model\FrontEnd\Comment;
 use App\Model\FrontEnd\CommentReply;
 use App\User;
-
+use App\Traits\BlogTrait;
 use DB;
 
 class BackEndController extends Controller
 {
+    use BlogTrait;
+
     public function index()
     {
         $blogs = DB::table('blogs')
@@ -67,32 +69,13 @@ class BackEndController extends Controller
 
     public function blogDetailsBackEnd($id)
     {
-         $blog_details = DB::table('blogs')
-                            ->join('users','users.id','blogs.user_id')
-                            ->select('blogs.*','users.name')
-                            ->where('blogs.id',$id)
-                            ->get();
-        $comments = DB::table('users')
-                    ->join('comments','users.id','comments.user_id')
-                    ->select('comments.*','users.name')
-                    ->where('comments.blog_id',$id)
-                    ->get();
-        $comment_replies= DB::table('comments')
-                    ->join('comment_replies','comments.id','comment_replies.comment_id')
-                    ->join('users','users.id','comment_replies.user_id')
-                    ->select('comment_replies.*','users.name')
-                    ->where('comments.blog_id',$id)
-                    ->get();
-        $tags = DB::table('blog_tags')
-                    ->join('tags','blog_tags.tag_id','tags.id')
-                    ->select('tags.*')
-                    ->where('blog_tags.blog_id',$id)
-                    ->get();
+        $data = $this->blogDetailsData($id);
+        
         return view('back-end.blog.details',[
-            'blog_details' => $blog_details,
-            'tags' => $tags,
-            'comments' => $comments,
-            'comment_replies' => $comment_replies,
+            'blog_details' => $data['blog_details'],
+            'tags' => $data['tags'],
+            'comments' => $data['comments'],
+            'comment_replies' => $data['comment_replies'],
         ]);
     }
 
@@ -118,17 +101,7 @@ class BackEndController extends Controller
     {
         $key_words =$request->keywords;
 
-        $blogs = DB::table('blogs')
-                    ->join('blog_tags','blog_tags.blog_id','blogs.id')
-                    ->join('sections','sections.id','blogs.section_id')
-                    ->join('tags','tags.id','blog_tags.tag_id')
-                    ->select('blogs.*')
-                    ->where('tags.name',"like", "%" . $request->keywords . "%")
-                    ->orWhere('sections.name',"like", "%" . $request->keywords . "%")
-                    ->orWhere('blogs.title',"like", "%" . $request->keywords . "%")
-                    ->orWhere('blogs.body',"like", "%" . $request->keywords . "%")
-                    ->groupBy('blogs.id')
-                    ->get();
+        $blogs = $this->BlogSearchData($request);
         return view('back-end.blog.result',[
             'blogs' => $blogs,
             'key_words' => $key_words,
