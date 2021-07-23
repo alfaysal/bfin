@@ -20,6 +20,7 @@ class AdminController extends Controller
 
         $admin->name = $request->name;
         $admin->email = $request->email;
+        $admin->password = bcrypt($request->password);
         $admin->is_super = $request->is_super;
 
         $admin->save();
@@ -60,7 +61,6 @@ class AdminController extends Controller
 
         $admin->name = $request->name;
         $admin->email = $request->email;
-        $admin->password = bcrypt($request->password);
         $admin->is_super = $request->is_super;
         $admin->save();
 
@@ -75,6 +75,6 @@ class AdminController extends Controller
         $admin->delete();
 
         return response()->json(['success'=>True]);
-        
+
     }
 }
