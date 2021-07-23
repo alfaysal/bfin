@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 class LoginController extends Controller
 {
     /*
@@ -36,5 +38,27 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    // protected function credentials(Request $request)
+    // {        
+    //    return ['email' => $request->{$this->username()}, 'password' => $request->password, 'is_blocked' => 0];
+    // }
+
+    public function login(Request $request)
+    {  
+        $inputVal = $request->all();
+   
+        $this->validate($request, [
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+   
+        if(auth()->attempt(array('email' => $inputVal['email'], 'password' => $inputVal['password'],'is_blocked' => 0))){
+
+                return redirect()->route('home');
+        }   
+
+         return redirect()->back()->withInput($request->only('email'))->with('error_login','you are not verified');
     }
 }

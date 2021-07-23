@@ -13,15 +13,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('front-end.home');
-});
+Route::get('/', 'HomeController@index')->name('home');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/details/{id}','FrontEnd\BlogController@blogDetails')->name('blog_details');
+Route::group(['prefix' => 'blog'], function () {
+
+   Route::get('/details/{id}','FrontEnd\BlogController@blogDetails')->name('blog_details');
+   Route::get('/tag/search/{id}','FrontEnd\BlogController@TagCategorized')->name('blog_tag_search');
+   Route::get('/section/search/{id}','FrontEnd\BlogController@SectionCategorized')->name('blog_section_search');
+   Route::post('/search','FrontEnd\BlogController@BlogSearch')->name('blog_search');
+   
+});
 
 
 Route::group(['prefix' => 'admin'], function () {
@@ -35,6 +39,19 @@ Route::group(['prefix' => 'admin'], function () {
 Route::group(['prefix' => 'admin','middleware' => 'auth:admin'], function () {
 
     Route::get('/home','BackEnd\BackEndController@index')->name('admin-home');
+    Route::get('/all/users','BackEnd\BackEndController@allUsers')->name('all_users');
+    Route::post('/user/blocked','BackEnd\BackEndController@userBlocked')->name('blocked_user');
+   
+});
+
+Route::group(['prefix' => 'blog','middleware' => 'auth:admin'], function () {
+
+    Route::get('/index','BackEnd\BackEndController@blogIndex')->name('all_blogs');
+    Route::get('/details/backend/{id}','BackEnd\BackEndController@blogDetailsBackEnd')->name('blog_detail_backend');
+    Route::get('/comment/delete/{id}','BackEnd\BackEndController@CommentDelete')->name('comment_delete');
+    Route::get('/comment/reply/delete/{id}','BackEnd\BackEndController@CommentReplyDelete')->name('comment_reply_delete');
+    Route::post('/blocked','BackEnd\BackEndController@blogBlocked')->name('blocked_status');
+    Route::post('/search/backend','BackEnd\BackEndController@blogSearchBackend')->name('search_back_end');
    
 });
 
@@ -64,6 +81,9 @@ Route::group(['prefix' => 'tag','middleware' => 'auth'], function () {
 Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
 
     Route::get('/dashboard','FrontEnd\ProfileController@userDashboard')->name('user_dashboard');
+    Route::get('/blogs','FrontEnd\ProfileController@MyBlogs')->name('my_blogs');
+    Route::get('/info/edit/{id}','FrontEnd\ProfileController@editUserInfo')->name('edit_user_info');
+    Route::post('/info/update','FrontEnd\ProfileController@updateUserInfo')->name('update_profile');
    
 });
 
@@ -71,6 +91,9 @@ Route::group(['prefix' => 'blog', 'middleware' => 'auth'], function () {
 
     Route::get('/create','FrontEnd\BlogController@createBlog')->name('create_blog');
     Route::post('/save','FrontEnd\BlogController@saveBlog')->name('save_stories');
+    Route::post('/update','FrontEnd\BlogController@updateBlog')->name('edit_stories');
+    Route::get('/delete/{id}','FrontEnd\BlogController@deleteBlog')->name('blog_delete');
+    Route::get('/edit/{id}','FrontEnd\BlogController@editBlog')->name('blog_edit');
     Route::post('/comment/save','FrontEnd\CommentController@commentSave')->name('add_comment');
     Route::post('/comment/reply/save','FrontEnd\CommentController@commentReplySave')->name('reply_save');
    

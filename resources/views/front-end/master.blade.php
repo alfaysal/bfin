@@ -28,7 +28,25 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
         <script src="{{ asset('/') }}/front-end/js/scripts.js"></script>
-       
+       <script >
+           window.addEventListener('DOMContentLoaded', event => {
+
+                // Toggle the side navigation
+                const sidebarToggle = document.body.querySelector('#sidebarToggle');
+                if (sidebarToggle) {
+                    // Uncomment Below to persist sidebar toggle between refreshes
+                    // if (localStorage.getItem('sb|sidebar-toggle') === 'true') {
+                    //     document.body.classList.toggle('sb-sidenav-toggled');
+                    // }
+                    sidebarToggle.addEventListener('click', event => {
+                        event.preventDefault();
+                        document.body.classList.toggle('sb-sidenav-toggled');
+                        localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+                    });
+                }
+
+            });
+       </script>
         @yield('js')
     </body>
 </html>

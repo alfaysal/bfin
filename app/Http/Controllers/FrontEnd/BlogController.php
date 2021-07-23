@@ -24,7 +24,7 @@ class BlogController extends Controller
 
     public function getImageUrl($request)
     {
-         $image = request()->file('image');
+        $image = request()->file('image');
 
         $image_name = time().$image->getClientOriginalName();
         $directory = 'front-end/stories-image/';
@@ -37,13 +37,7 @@ class BlogController extends Controller
     public function saveBlog(Request $request)
     {
 
-        $validated = $request->validate([
-            'title' => 'required|max:255',
-            'body' => 'required',
-            'section_id' => 'required',
-            'image' => ['required','mimes:jpeg,bmp,png,jpg'],
-            'caption' => 'required'
-        ]);
+        $this->validateBlog($request);
 
         DB::transaction(function() use ($request){
             $blog = new Blog();
@@ -56,6 +50,7 @@ class BlogController extends Controller
             $blog->body = $request->body;
             $blog->image = $image_url;
             $blog->caption = $request->caption;
+            $blog->is_published = $request->is_published;
 
             $blog->save();
 
@@ -66,6 +61,17 @@ class BlogController extends Controller
         
 
         return redirect()->back()->with('blog_message','stories saved');
+    }
+
+    public function validateBlog($request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|max:255',
+            'body' => 'required',
+            'section_id' => 'required',
+            'image' => ['required','mimes:jpeg,bmp,png,jpg'],
+            'caption' => 'required'
+        ]);
     }
 
     public function BlogTagSave($request,$blog_id)
@@ -94,8 +100,8 @@ class BlogController extends Controller
                     ->where('comments.blog_id',$id)
                     ->get();
         $comment_replies= DB::table('comments')
-                    ->join('users','users.id','comments.user_id')
                     ->join('comment_replies','comments.id','comment_replies.comment_id')
+                    ->join('users','users.id','comment_replies.user_id')
                     ->select('comment_replies.*','users.name')
                     ->where('comments.blog_id',$id)
                     ->get();
@@ -111,4 +117,135 @@ class BlogController extends Controller
             'comment_replies' => $comment_replies,
         ]);
     }
+
+    public function TagCategorized($id)
+    {
+        $tag = Tag::find($id);
+        $key_words = $tag->name;
+        $blogs = DB::table('blog_tags')
+                    ->join('blogs','blog_tags.blog_id','blogs.id')
+                    ->select('blogs.*')
+                    ->where('blog_tags.tag_id',$id)
+                    ->get();
+        
+        return $this->viewFileForResult($blogs,$key_words);
+    }
+
+    public function viewFileForResult($blogs,$key_words)
+    {
+       return view('front-end.blog.result',[
+            'blogs' =>  $blogs,
+            'key_words' =>  $key_words,
+        ]);
+    }
+
+    public function SectionCategorized($id)
+    {
+        $section = Section::find($id);
+        $key_words = $section->name;
+        // ********* One to Many Relation in Model*******
+        $blogs = Section::find($id)->blogs()->get();
+        
+        return $this->viewFileForResult($blogs,$key_words);
+    }
+
+    public function BlogSearch(Request $request)
+    {
+        $key_words =$request->keywords;
+
+        $blogs = DB::table('blogs')
+                    ->join('blog_tags','blog_tags.blog_id','blogs.id')
+                    ->join('sections','sections.id','blogs.section_id')
+                    ->join('tags','tags.id','blog_tags.tag_id')
+                    ->select('blogs.*')
+                    ->where('tags.name',"like", "%" . $request->keywords . "%")
+                    ->orWhere('sections.name',"like", "%" . $request->keywords . "%")
+                    ->orWhere('blogs.title',"like", "%" . $request->keywords . "%")
+                    ->orWhere('blogs.body',"like", "%" . $request->keywords . "%")
+                    ->groupBy('blogs.id')
+                    ->get();
+
+        return $this->viewFileForResult($blogs,$key_words);
+
+    }
+
+    public function editBlog($id)
+    {
+        $blog = Blog::find($id);
+        $sections = Section::all();
+        $tags = Tag::all();
+        $blog_tags = DB::table('blog_tags')
+                    ->join('tags','blog_tags.tag_id','tags.id')
+                    ->select('tags.*')
+                    ->where('blog_tags.blog_id',$id)
+                    ->get();
+
+        return view('front-end.blog.edit_blog',[
+            'blog'  =>  $blog,
+            'tags'  =>  $tags,
+            'blog_tags'  =>  $blog_tags,
+            'sections'  =>  $sections,
+        ]);
+    }
+
+
+    public function updateBlog(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|max:255',
+            'body' => 'required',
+            'section_id' => 'required',
+            'image' => ['mimes:jpeg,bmp,png,jpg'],
+            'caption' => 'required'
+        ]);
+
+        DB::transaction(function() use ($request){
+            $blog = Blog::find($request->id);
+
+            $image = request()->file('image');
+
+            if($image){
+              unlink(public_path($request->old_image));
+             $image_url = $this->getImageUrl($request);
+            }else{
+                 $image_url = $request->old_image;
+            }
+
+            $blog->title = $request->title;
+            $blog->section_id = $request->section_id;
+            $blog->user_id = $request->user_id;
+            $blog->body = $request->body;
+            $blog->image = $image_url;
+            $blog->caption = $request->caption;
+            $blog->is_published = $request->is_published;
+
+            $blog->save();
+
+            $blog_tags = BlogTag::where('blog_id',$request->id)->get();
+            
+            foreach($blog_tags as $blog_tag){
+                $tag = BlogTag::find($blog_tag->id);
+
+                $tag->delete();
+            }
+
+            $this->BlogTagSave($request,$request->id);
+
+        });
+
+        return redirect()->back()->with('edit_blog','Blog Updated Successfully');
+
+
+    }
+
+    public function deleteBlog($id)
+    {
+        $blog = Blog::find($id);
+        $blog->delete();
+
+        return redirect()->back()->with('delete_blog','Blog Deleted');
+
+    }
+
+
 }

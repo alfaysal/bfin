@@ -30,7 +30,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -72,9 +72,9 @@ class RegisterController extends Controller
     {
         $image = request()->file('image');
 
-        $image_name = $image->getClientOriginalName();
+        $image_name = time().$image->getClientOriginalName();
         $directory = 'front-end/user-image/';
-        $image_url = time().$directory.$image_name;
+        $image_url = $directory.$image_name;
         $image->move($directory,$image_name);
 
         return User::create([

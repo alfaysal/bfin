@@ -14,6 +14,12 @@
                 <div class="card-header">Log in </div>
 
                 <div class="card-body">
+                    
+                                @if(Session::has('error_login'))
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">{{ Session::get('error_login') }}
+                                    </div>
+
+                                 @endif
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
                         <div class="form-group row mb-4">
@@ -22,11 +28,6 @@
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
                             </div>
                         </div>
 

@@ -1,12 +1,33 @@
-@extends('front-end.master')
+@extends('back-end.master')
 
 @section('title')
-    <title>BFIN Blog Details</title>
+  <title>Blog Details</title>
+@endsection
+
+
+
+@section('bread_crumb')
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="m-0 float-right">Blog Details</h1>
+          </div><!-- /.col -->
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Blog Details</li>
+            </ol>
+          </div><!-- /.col -->
+        </div><!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
 @endsection
 
 
 @section('content')
-        <div class="container mt-5">
+
+  <div class="container mt-5">
             <div class="row">
                 @foreach($blog_details as $blog_detail)
                 <div class="col-lg-8">
@@ -29,7 +50,7 @@
                         </header>
                         <figure class="mb-4"><img class="img-fluid rounded" src="{{ asset($blog_detail->image) }}" alt="..." /></figure>
                         <section class="mb-5">
-                            <h4>{{ $blog_detail->caption }}</h4>
+                            <h4 class="mb-2">{{ $blog_detail->caption }}</h4>
                            {{ $blog_detail->body }}
                         </section>
                     </article>
@@ -38,20 +59,14 @@
                         <section class="mb-5">
                             <div class="card bg-light">
                                 <div class="card-body">
-                                    <!-- Comment form-->
-                                    <form class="mb-4" action="{{ route('add_comment') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $blog_detail->id }}">
-                                        <textarea name="comments" class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea>
-                                        <input type="submit" style="float:right;" class="btn btn-primary mt-2" name="add comment" value="submit">
-                                    </form>
+                                    
                                     @foreach($comments as $comment)
                                     <div class="d-flex mb-4 mt-4">
                                         <!-- Parent comment-->
                                         <div class="flex-shrink-0"><img class="rounded-circle" src="https://dummyimage.com/50x50/ced4da/6c757d.jpg" alt="..." /></div>
                                         <div class="ms-3">
                                             <div class="fw-bold">{{ $comment->name }}</div>
-                                           {{ $comment->comments }}
+                                           {{ $comment->comments }}<a class="btn btn-danger btn-sm" href="{{ route('comment_delete',['id' => $comment->id]) }}" onclick="return confirm('Are you sure?')">delete</a>
                                             
                                             @foreach($comment_replies as $reply)
 
@@ -61,6 +76,7 @@
                                                 <div class="ms-3">
                                                     <div class="fw-bold">{{ $reply->name }}</div>
                                                     {{ $reply->reply }}
+                                                    <a class="btn btn-danger btn-sm" href="{{ route('comment_reply_delete',['id' => $reply->id]) }}" onclick="return confirm('Are you sure?')">delete</a>
                                                 </div>
                                             </div>
                                             @endif
@@ -85,26 +101,9 @@
                     @endif
                 </div>
                 @endforeach
-                <!-- Side widgets-->
-                @include('front-end.includes.sidebar')
                     
             </div>
         </div>
+
 @endsection
-
-@section('js')
-    <script type="text/javascript">
-        function appendReplyForm(id) {
-            var append_id = '#reply_form'+id
-            var html = ''
-
-            html = '<textarea class="form-control" name="reply" rows="2"></textarea><input style="float:right" type="submit" value="submit" name="submit" class="btn btn-sm btn-success">'
-            $(append_id).html(html)
-        }
-    </script>
-@endsection
-
-
-
-
 

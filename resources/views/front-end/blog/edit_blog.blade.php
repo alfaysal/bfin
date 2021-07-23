@@ -1,7 +1,7 @@
 @extends('front-end.master')
 
 @section('title')
-    <title>bfin</title>
+    <title>Edit Blog</title>
 @endsection
 
 @section('css')
@@ -30,8 +30,8 @@
                         @include('front-end.profile.sidebar')
                         <div id="page-content-wrapper">  
                             <div class="container-fluid">
-                                @if(Session::has('blog_message'))
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">{{ Session::get('blog_message') }}
+                                @if(Session::has('edit_blog'))
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">{{ Session::get('edit_blog') }}
                                     </div>
 
                                  @endif
@@ -46,29 +46,34 @@
                                         </div>
                                     @endif
 
-                                <form action="{{ route('save_stories') }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('edit_stories') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="card card-dark mt-4">
                                       <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h3 class="card-title">Create Blog</h3>
+                                        <h3 class="card-title">Edit Blog</h3>
                                       </div>
 
                                         <div class="card-body table-responsive p-3">
                                             <div class="form-group">
                                                 <label>Title</label>
-                                                <input class="form-control input-sm" type="text" value="{{ old('title') }}" name="title" required="">
+                                                <input type="hidden" value="{{ $blog->id }}" name="id" required="">
+                                                <input type="hidden" value="{{ $blog->user_id }}" name="user_id" required="">
+                                                <input class="form-control input-sm" type="text" value="{{ $blog->title }}" name="title" required="">
                                             </div>
 
                                             <div class="form-group">
                                                 <label>Body</label>
-                                                <textarea class="form-control" name="body" rows="4">{{ old('body') }}</textarea>
+                                                <textarea class="form-control" name="body" rows="4">{{ $blog->body }}</textarea>
                                             </div>
 
                                             <div class="form-group">
                                                 <label>Section</label>
                                                 <select class="form-control" required="" name="section_id">
-                                                    <option value="">Select Section Type</option>
+                                                   
                                                     @foreach($sections as $section)
+                                                     @if($section->id == $blog->section_id)
+                                                        <option selected value="{{ $section->id }}">{{ $section->name }}</option>
+                                                     @endif
                                                     <option value="{{ $section->id }}">{{ $section->name }}</option>
                                                     @endforeach
                                                 </select>
@@ -77,27 +82,41 @@
                                             <div class="form-group">
                                               <label>Multiple</label>
                                               <select class="select2" required="" name="tags[]" multiple="multiple" data-placeholder="Select Tags" style="width: 100%;">
-                                                <option value="">Select Tags</option>
-                                                @foreach($tags as $tag)
-                                                    <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                            @foreach($tags as $tag)
+                                                @foreach($blog_tags as $blog_tag)
+                                                    @if($blog_tag->id == $tag->id)
+                                                    <option selected="" value="{{ $blog_tag->id }}">{{ $blog_tag->name }}</option>
+                                                    @endif
+
                                                 @endforeach
+                                                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                            @endforeach
+
+                                               
                                               </select>
                                             </div>
 
                                             <div class="form-group">
                                                 <label>Image</label>
-                                                <input type="file" class="form-control" name="image">
+                                                <img style="width: 70px; height: 70px" src="{{ asset($blog->image)  }}">
+                                                <input type="hidden" name="old_image" value="{{ $blog->image }}">
+                                                <input type="file" name="image"  class="form-control" >
                                             </div>
 
                                             <div class="form-group">
                                                 <label>Image Caption</label>
-                                                <input type="text" class="form-control" value="{{ old('caption') }}" name="caption">
+                                                <input type="text" class="form-control" value="{{ $blog->caption }}" name="caption">
                                             </div>
-
                                             <div class="form-group">
                                                 <label>Publish Status</label>
                                                 <select class="form-control" name="is_published">
-                                                    <option value=""> Select Published Status</option>
+                                                    @if($blog->is_published == 0)
+                                                    <option value="0">published</option>
+                                                    @else
+                                                    <option value="1">only me</option>
+
+                                                    @endif
+
                                                     <option value="0">published</option>
                                                     <option value="1">only me</option>
                                                 </select>
@@ -105,7 +124,7 @@
                                         </div>
 
                                         <div class="card-footer">
-                                            <input class="btn btn-success" type="submit" name="submit" value="Add Tag">
+                                            <input class="btn btn-success" type="submit" name="submit" value="Submit">
                                             
                                         </div>
                                         </div>                

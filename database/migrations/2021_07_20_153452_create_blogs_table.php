@@ -22,6 +22,7 @@ class CreateBlogsTable extends Migration
             $table->text('image');
             $table->text('caption');
             $table->tinyInteger('is_blocked')->default(0);
+            $table->tinyInteger('is_published')->default(0);
             $table->timestamps();
 
             $table->foreign('section_id')->references('id')->on('sections')->onDelete('cascade');
