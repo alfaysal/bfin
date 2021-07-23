@@ -40,6 +40,12 @@ Route::group(['prefix' => 'admin','middleware' => 'auth:admin'], function () {
 
     Route::get('/home','BackEnd\BackEndController@index')->name('admin-home');
     Route::get('/all/users','BackEnd\BackEndController@allUsers')->name('all_users');
+    Route::get('/create','BackEnd\AdminController@CreateAdmin')->name('admin_index');
+    Route::get('/data','BackEnd\AdminController@getAdminData')->name('admin_data');
+    Route::post('/store','BackEnd\AdminController@StoreAdmin');
+    Route::post('/edit','BackEnd\AdminController@EditAdmin');
+    Route::post('/update','BackEnd\AdminController@UpdateAdmin');
+    Route::post('/delete','BackEnd\AdminController@DeleteAdmin');
     Route::post('/user/blocked','BackEnd\BackEndController@userBlocked')->name('blocked_user');
    
 });

@@ -34,12 +34,6 @@
                 </a>
               </li>
 
-              <li class="nav-item ">
-                <a href="" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Search & Insert</p>
-                </a>
-              </li>
               
 
             </ul>
@@ -62,22 +56,36 @@
                 </a>
               </li>
 
+
+            </ul>
+          </li>
+
+          <li class="nav-item {{($prefix == '/admin') ? 'menu-open':' '}}">
+            <a href="#" class="nav-link">
+            <i class="fas fa-users"></i>
+
+              <p>
+                Admin
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
               <li class="nav-item ">
-                <a href="" class="nav-link">
+                <a href="{{ route('admin_index') }}" class="nav-link {{($route == 'admin_index') ? 'active':' '}}">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Search & Insert</p>
+                  <p>index</p>
                 </a>
               </li>
-              
+
 
             </ul>
           </li>
 
           <li class="nav-item {{($prefix == '/section') ? 'menu-open':' '}}">
             <a href="#" class="nav-link">
-              <i class="fas fa-users"></i>
+              <i class="fas fa-road"></i>
               <p>
-                Category & Tags
+                Section
                 <i class="fas fa-angle-left right"></i>
               </p>
             </a>
@@ -88,14 +96,6 @@
                   <p>Sections</p>
                 </a>
               </li>
-
-              <li class="nav-item ">
-                <a href="" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Tags</p>
-                </a>
-              </li>
-              
 
             </ul>
           </li>

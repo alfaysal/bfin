@@ -70,7 +70,7 @@ class BackEndController extends Controller
     public function blogDetailsBackEnd($id)
     {
         $data = $this->blogDetailsData($id);
-        
+
         return view('back-end.blog.details',[
             'blog_details' => $data['blog_details'],
             'tags' => $data['tags'],
@@ -107,4 +107,6 @@ class BackEndController extends Controller
             'key_words' => $key_words,
         ]);
     }
+
+    
 }
